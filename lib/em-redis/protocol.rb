@@ -32,14 +32,35 @@ module EM::P::Redis
     end
   end
 
-  ## Commands
-
   def ping
     send_request("PING") do |response|
       yield response if block_given?
     end
   end
 
+  # ECHO message.
+  #
+  # It returns the message.
+  #
+  # @param [String] message the message to be echoed.
+  # @yield [response] An optional callback can be supplied by the user.
+  # @yieldparam [String] response The response from the Redis server.
+  # @example Use echo with a callback
+  #
+  #    EM.run do
+  #      redis = EM::P::Redis.connect
+  #      redis.echo("around the world in a millionth of a second") do |response|
+  #        puts "Response from redis server: #{response}"
+  #      end
+  #    end
+  #
+  # @example Use echo with no callback
+  #
+  #   EM.run do
+  #     redis = EM::P::Redis.connect
+  #     redis.echo("into the black hole")
+  #   end
+  #
   def echo(message)
     command = ["ECHO", message]
     send_request(command) do |response|
