@@ -1,10 +1,17 @@
 module EM::P::Redis
+  # @private
   COLON     = ":".freeze
+  # @private
   MINUS     = "-".freeze
+  # @private
   PLUS      = "+".freeze
+  # @private
   DOLLAR    = "$".freeze
+  # @private
   ASTERISK  = "*".freeze
+  # @private
   DELIMITER = "\r\n".freeze
+  # @private
   BULK      = true.freeze
 
   def self.connect(options = {})
@@ -13,11 +20,13 @@ module EM::P::Redis
     EM.connect host, port, self
   end
 
+  # @private
   def send_request(line, &blk)
     @callback = blk
     send_data format_as_multi_bulk_reply(line)
   end
 
+  # @private
   def receive_data(reply)
     (@buffer ||= "") << reply
     while index = @buffer.index(DELIMITER)
