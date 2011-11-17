@@ -23,7 +23,7 @@ module EM::P::Redis
   # @private
   def send_request(line, &blk)
     @callback = blk
-    send_data format_as_multi_bulk_reply(line)
+    send_data line
   end
 
   # @private

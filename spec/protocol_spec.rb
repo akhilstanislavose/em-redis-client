@@ -1,21 +1,23 @@
 require_relative 'spec_helper'
 
-describe EM::P::Redis, "The Redis Protocol" do
+describe EM::P::Redis, "The Redis protocol client" do
   before(:each) do
     @c = TestConnection.new
   end
 
   it { should respond_to(:connect) }
 
-  describe "Requests" do
-    describe "Multi-bulk Reply Format" do
-      it "should send a when input is a string" do
+  describe "sending requests to the server" do
+    describe "supports multi-bulk reply format" do
+      it "when input is a string" do
+        pending "warm up exercise"
         request = "SET mykey myvalue"
         encoded_request = "*3\r\n$3\r\nSET\r\n$5\r\nmykey\r\n$7\r\nmyvalue\r\n"
         @c.send_request(request).should == encoded_request
       end
 
-      it "should send a request when input is array" do
+      it "when input is an array" do
+        pending "warm up exercise"
         request = ["ECHO", "hello world"]
         encoded_request = "*2\r\n$4\r\nECHO\r\n$11\r\nhello world\r\n"
         @c.send_request(request).should == encoded_request
