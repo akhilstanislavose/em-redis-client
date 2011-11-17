@@ -32,6 +32,21 @@ module EM::P::Redis
     end
   end
 
+  ## Commands
+
+  def ping
+    send_request("PING") do |response|
+      yield response if block_given?
+    end
+  end
+
+  def echo(message)
+    command = ["ECHO", message]
+    send_request(command) do |response|
+      yield response if block_given?
+    end
+  end
+
   private
 
   def response_incomplete?
@@ -106,11 +121,15 @@ module EM::P::Redis
     @multi_argc   = argc
   end
 
-  def format_as_multi_bulk_reply(line)
-    words = line.split
-    prefix = multi_bulk_reply_prefix_from(words.size)
-    words.inject(prefix) do |reply, each_word|
-      reply += format_as_bulk_reply(each_word)
+  def format_as_multi_bulk_reply(argv)
+    args = if argv.kind_of?(String)
+             argv.split
+           else
+             argv
+           end
+    prefix = multi_bulk_reply_prefix_from(args.size)
+    args.inject(prefix) do |reply, arg|
+      reply += format_as_bulk_reply(arg)
     end
   end
 
@@ -120,11 +139,11 @@ module EM::P::Redis
       DELIMITER
   end
 
-  def format_as_bulk_reply(word)
+  def format_as_bulk_reply(arg)
     DOLLAR               +
-      word.bytesize.to_s +
+      arg.bytesize.to_s  +
       DELIMITER          +
-      word               +
+      arg                +
       DELIMITER
   end
 end
