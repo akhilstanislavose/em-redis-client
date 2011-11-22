@@ -22,7 +22,8 @@ module EM::P::Redis
 
   # @private
   def send_request(line, &blk)
-    @callback = blk
+    @callback = Queue.new if @callback.nil?
+    @callback.push blk
     send_data format_as_multi_bulk_reply(line)
   end
 
@@ -93,7 +94,7 @@ module EM::P::Redis
 
   def dispatch_response(response)
     @multi_bulk = false
-    @callback.call(response)
+    @callback.pop.call(response)
   end
 
   def type_minus(args)

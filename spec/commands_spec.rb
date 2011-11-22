@@ -16,7 +16,6 @@ describe EM::P::Redis, "The Redis Commands" do
   end
 
   it "should support nested commands" do
-    pending "not supported. todo."
     EM.run do
       redis = EM::P::Redis.connect
       redis.ping do |response_ping|
@@ -25,9 +24,29 @@ describe EM::P::Redis, "The Redis Commands" do
           # test will be executed only when response_echo arrives through the network
           response_ping.should == "PONG"
           response_echo.should == "message in a bottle"
+          EM.stop
         end
       end
       # immediately executed. Does not wait for nested commands above.
+    end
+  end
+
+  it "should support successive requests" do
+    EM.run do
+      redis = EM::P::Redis.connect
+      redis.echo("zero") do |zero|
+        # odd
+        redis.echo("one") do |one|
+          zero.should == "zero"
+          one.should  == "one"
+        end
+        # even
+        redis.echo("two") do |two|
+          zero.should == "zero"
+          two.should  == "two"
+          EM.stop
+        end
+      end
     end
   end
 end
